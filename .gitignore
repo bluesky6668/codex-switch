@@ -1,0 +1,6 @@
+.build/
+.DS_Store
+.env
+auth.json
+accounts.json
+*.keychain-db
