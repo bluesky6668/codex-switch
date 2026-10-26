@@ -31,7 +31,7 @@ extension Color {
     }
 }
 
-/// 计划标签：PLUS / PRO / TEAM / FREE 等，配色对应原版的 planChip。
+/// 计划标签：PLUS / PRO / TEAM / FREE 等。
 struct PlanChip: View {
     let plan: String?
 
@@ -62,7 +62,7 @@ struct PlanChip: View {
     }
 }
 
-/// 原版的白底细边框按钮（“切换”等）。
+/// 白底细边框按钮（“切换”等）。
 struct OutlineButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -76,7 +76,7 @@ struct OutlineButtonStyle: ButtonStyle {
     }
 }
 
-/// 原版右上角的蓝色主按钮（“添加账号”）。
+/// 蓝色主按钮（“添加账号”等）。
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

@@ -1,4 +1,4 @@
-// 账号列表：表头 + 行 + 底栏，对应原版的账号页（去掉了反代与重置卡列）。
+// 账号列表：表头、账号行与底栏。
 import SwiftUI
 
 private enum Column {
@@ -226,7 +226,7 @@ struct AccountRow: View {
     }
 }
 
-/// 原版的额度单元格：进度条 + 剩余百分比，下方是重置时间。余量低时变黄，耗尽变红。
+/// 额度单元格：进度条 + 剩余百分比，下方是重置时间。余量低时变黄，耗尽变红。
 struct UsageCell: View {
     let window: UsageWindow?
     let fetched: Bool
