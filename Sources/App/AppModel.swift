@@ -38,7 +38,7 @@ struct Toast: Equatable {
 }
 
 @MainActor
-final class AppModel: ObservableObject {
+final class AppModel: NSObject, ObservableObject {
     @Published private(set) var accounts: [AccountMeta] = []
     @Published private(set) var currentKey: String?
     /// 当前 auth.json 里的登录尚未加入账号库时不为 nil。
@@ -69,19 +69,24 @@ final class AppModel: ObservableObject {
     private var usageTimer: Timer?
     private var lastUsageRefresh: Date?
 
-    init() {
+    override init() {
+        super.init()
         reload()
         // 只读本地文件（索引与 auth.json），不访问钥匙串、不联网，开销很小。
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.reload() }
-        }
+        timer = Timer.scheduledTimer(
+            timeInterval: 10, target: self, selector: #selector(periodicReload),
+            userInfo: nil, repeats: true)
         // 截图模式用的是伪造令牌，绝不能发出真实请求。
         guard ProcessInfo.processInfo.environment["CODEX_SWITCH_SNAPSHOT"] == nil else { return }
-        usageTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refreshUsageIfDue() }
-        }
+        usageTimer = Timer.scheduledTimer(
+            timeInterval: 60, target: self, selector: #selector(periodicUsageRefresh),
+            userInfo: nil, repeats: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { self.refreshUsageIfDue() }
     }
+
+    @objc private func periodicReload(_ timer: Timer) { reload() }
+
+    @objc private func periodicUsageRefresh(_ timer: Timer) { refreshUsageIfDue() }
 
     /// 5 小时窗口剩余百分比（没有 5 小时窗口时用每周窗口），给菜单栏显示。
     var currentRemaining: String? {
@@ -134,7 +139,7 @@ final class AppModel: ObservableObject {
     // MARK: - 操作
 
     /// 在后台队列持锁执行一次账号库操作，结束后刷新并提示结果。
-    private func perform(_ title: String, _ body: @escaping (inout Manager) throws -> String) {
+    private func perform(_ title: String, _ body: @escaping @Sendable (inout Manager) throws -> String) {
         guard busy == nil else { return }
         busy = title
         queue.async {
@@ -146,11 +151,11 @@ final class AppModel: ObservableObject {
                 manager.log = { lines.append($0) }
                 return try body(&manager)
             }
+            let warnings = lines.filter { $0.hasPrefix("! ") }.map { String($0.dropFirst(2)) }
             DispatchQueue.main.async {
                 self.busy = nil
                 switch result {
                 case let .success(message):
-                    let warnings = lines.filter { $0.hasPrefix("! ") }.map { String($0.dropFirst(2)) }
                     self.show(([message] + warnings).joined(separator: "\n"), isError: false)
                 case let .failure(error):
                     self.show("\(error)", isError: true)
@@ -242,12 +247,13 @@ final class AppModel: ObservableObject {
                 try doctor.run()
                 return doctor.findings
             }
+            let completedNotes = notes
             DispatchQueue.main.async {
                 self.busy = nil
                 switch result {
                 case let .success(findings):
                     self.findings = findings
-                    if fix { self.show((["修复完成"] + notes).joined(separator: "\n"), isError: false) }
+                    if fix { self.show((["修复完成"] + completedNotes).joined(separator: "\n"), isError: false) }
                 case let .failure(error):
                     self.show("\(error)", isError: true)
                 }
@@ -275,12 +281,13 @@ final class AppModel: ObservableObject {
                 do { try fetchAndStoreUsage(accountID: id) } catch { failures.append("\(label)：\(error)") }
                 DispatchQueue.main.async { self.reload() }
             }
+            let completedFailures = failures
             DispatchQueue.main.async {
                 self.refreshingUsage = false
                 self.lastUsageRefresh = Date()
                 if manual {
-                    self.show(failures.isEmpty ? "额度已更新" : "额度查询失败\n" + failures.joined(separator: "\n"),
-                              isError: !failures.isEmpty)
+                    self.show(completedFailures.isEmpty ? "额度已更新" : "额度查询失败\n" + completedFailures.joined(separator: "\n"),
+                              isError: !completedFailures.isEmpty)
                 }
             }
         }

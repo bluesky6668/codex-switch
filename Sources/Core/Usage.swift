@@ -134,6 +134,24 @@ enum TokenRefresher {
 enum HTTP {
     private static let allowedHosts: Set<String> = ["chatgpt.com", "auth.openai.com"]
 
+    /// URLSession 的完成回调是并发执行的；用加锁容器在线程间传递结果。
+    private final class ResponseBox: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value: Result<(Int, Data), Error> = .failure(ToolError("网络请求未完成"))
+
+        func store(_ result: Result<(Int, Data), Error>) {
+            lock.lock()
+            value = result
+            lock.unlock()
+        }
+
+        func load() -> Result<(Int, Data), Error> {
+            lock.lock()
+            defer { lock.unlock() }
+            return value
+        }
+    }
+
     private final class NoRedirect: NSObject, URLSessionTaskDelegate {
         func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                         newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
@@ -157,17 +175,17 @@ enum HTTP {
             throw ToolError("拒绝访问未授权的地址")
         }
         let done = DispatchSemaphore(value: 0)
-        var result: Result<(Int, Data), Error> = .failure(ToolError("网络请求未完成"))
+        let result = ResponseBox()
         session.dataTask(with: request) { data, response, error in
             if let error {
-                result = .failure(ToolError("网络请求失败：\(error.localizedDescription)"))
+                result.store(.failure(ToolError("网络请求失败：\(error.localizedDescription)")))
             } else {
-                result = .success(((response as? HTTPURLResponse)?.statusCode ?? 0, data ?? Data()))
+                result.store(.success(((response as? HTTPURLResponse)?.statusCode ?? 0, data ?? Data())))
             }
             done.signal()
         }.resume()
         done.wait()
-        return try result.get()
+        return try result.load().get()
     }
 }
 

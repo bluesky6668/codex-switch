@@ -70,10 +70,21 @@ Codex Switch 把切换动作收拢成一个可检查、可撤销的本地流程�
 
 ## 安装
 
-### 环境要求
+### 直接下载（推荐）
 
-- macOS 14 或更高版本
-- Xcode Command Line Tools（需要 `swiftc`）
+前往 [GitHub Releases](https://github.com/bluesky6668/codex-switch/releases/latest)，下载 `Codex-Switch-*-macOS-universal.zip`。压缩包已经由 GitHub Actions 在线编译，同时支持 Apple Silicon 与 Intel Mac，普通用户**不需要安装 Swift 或 Xcode**。
+
+解压后：
+
+1. 把 `Codex Switch.app` 拖入“应用程序”文件夹。
+2. 如果需要命令行工具，再把同目录的 `codex-switch` 复制到自己的 PATH。
+3. 当前公开版本采用 ad-hoc 签名，尚未使用 Apple Developer ID 公证。首次打开若被 macOS 拦截，请在 Finder 中右键应用并选择“打开”，确认来源是本仓库后再允许运行。
+
+每个 Release 同时提供 `SHA256SUMS.txt`，可用于核对下载文件是否完整。
+
+### 从源码编译
+
+开发者自行编译时需要 macOS 14 或更高版本，以及 Xcode Command Line Tools（包含 `swiftc`）：
 
 ```bash
 xcode-select --install
@@ -92,7 +103,7 @@ mkdir -p ~/.local/bin
 cp .build/codex-switch ~/.local/bin/
 ```
 
-应用和 CLI 使用 ad-hoc 签名。每次重新编译后，macOS 可能会再次询问是否允许访问钥匙串；确认程序来自你刚刚编译的源码后，可选择“始终允许”。
+应用和 CLI 使用 ad-hoc 签名。每次重新编译后，macOS 可能会再次询问是否允许访问钥匙串；确认程序来自本仓库或你刚刚编译的源码后，可选择“始终允许”。
 
 ## 快速开始
 

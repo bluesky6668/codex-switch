@@ -26,7 +26,7 @@ final class CodexLogin: @unchecked Sendable {
     deinit { scrubRecursively(home) }
 
     /// output 为 nil 时继承终端输出；否则逐段回调 codex 的输出（含登录链接）。
-    func run(output: ((String) -> Void)? = nil) throws -> AuthSnapshot {
+    func run(output: (@Sendable (String) -> Void)? = nil) throws -> AuthSnapshot {
         if let output {
             let pipe = Pipe()
             process.standardOutput = pipe
