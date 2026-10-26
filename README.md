@@ -1,3 +1,7 @@
+<p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本語</a> · <a href="README.de.md">Deutsch</a> · <a href="README.fr.md">Français</a> · <a href="README.es.md">Español</a>
+</p>
+
 <div align="center">
   <img src="assets/app-icon.png" width="128" height="128" alt="Codex Switch icon">
 
