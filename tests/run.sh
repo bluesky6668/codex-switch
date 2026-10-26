@@ -163,5 +163,5 @@ check "列表在没有额度数据时提示查询" 0 "$BIN" list
 contains "提示运行 usage" "codex-switch usage"
 
 echo
-echo "通过 $PASS，失败 $FAIL"
+echo "通过 ${PASS}，失败 ${FAIL}"
 [ $FAIL -eq 0 ]
