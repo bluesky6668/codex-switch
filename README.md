@@ -3,9 +3,9 @@
 
   # Codex Switch
 
-  **一个专注隐私与安全的 macOS Codex 多账号切换工具**
+  **方便快速切换 ChatGPT / Codex 账号的 macOS 菜单栏工具**
 
-  菜单栏应用与命令行工具共用同一套账号数据。令牌只保存在 macOS 钥匙串中，不创建明文账号库，也不开放本地端口。
+  不用反复退出登录，也不用手工替换认证文件。菜单栏应用与命令行工具共用同一套账号数据，令牌只保存在 macOS 钥匙串中。
 
   [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-111111?logo=apple)](https://www.apple.com/macos/)
   [![Swift 5](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://www.swift.org/)
@@ -17,7 +17,7 @@
 
 ## 为什么做这个工具
 
-Codex 的登录信息保存在 `~/.codex/auth.json`。手工备份和替换这个文件不仅麻烦，也很容易把长期有效的刷新令牌留在普通文件、聊天记录或脚本中。
+在多个 ChatGPT / Codex 账号之间切换时，反复退出登录既慢又容易打断当前工作。Codex 的登录信息保存在 `~/.codex/auth.json`，手工备份和替换不仅麻烦，也容易把长期有效的刷新令牌留在普通文件、聊天记录或脚本中。
 
 Codex Switch 把切换动作收拢成一个可检查、可撤销的本地流程：
 
@@ -66,7 +66,7 @@ Codex Switch 把切换动作收拢成一个可检查、可撤销的本地流程�
 - **设置页**：配置应用重启策略、菜单栏显示方式、额度刷新间隔和数据位置。
 - **添加账号**：保存当前登录、通过官方 `codex login` 登录，或从指定 `auth.json` 导入并选择是否删除源文件。
 
-主窗口打开时会显示 Dock 图标；窗口关闭后，应用继续驻留菜单栏。
+主窗口打开时会显示 Dock 图标；点红色关闭按钮后，应用继续驻留菜单栏并自动从 Dock 隐藏。从菜单栏选择“打开主窗口”时，Dock 图标会重新出现。
 
 ## 安装
 

@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct CodexSwitchApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model = AppModel()
 
     init() {
@@ -16,7 +17,6 @@ struct CodexSwitchApp: App {
             MainWindow()
                 .environmentObject(model)
                 .onAppear { NSApp.setActivationPolicy(.regular) }
-                .onDisappear { NSApp.setActivationPolicy(.accessory) }
         }
         .defaultSize(width: 980, height: 640)
         .windowStyle(.hiddenTitleBar)
@@ -113,7 +113,11 @@ private struct MenuContent: View {
 
     private func open(_ page: AppModel.Page) {
         model.page = page
+        NSApp.setActivationPolicy(.regular)
         openWindow(id: "main")
-        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: true)
+            NSApp.windows.first { $0.title == "Codex Switch" }?.makeKeyAndOrderFront(nil)
+        }
     }
 }

@@ -132,7 +132,7 @@ struct SettingsPage: View {
                 }
                 section("关于") {
                     row("Codex Switch \(toolVersion)",
-                        "独立开发，专注本机账号切换与钥匙串安全存储") {
+                        "方便快速切换 ChatGPT / Codex 账号，并用钥匙串安全保存登录信息") {
                         Text("MIT License").font(.system(size: 12)).foregroundStyle(Theme.subtle)
                     }
                 }
